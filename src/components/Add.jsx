@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { addStu, getStuByid, editStuByIdApi } from "../Api/stuApi";
+import { getStuByid } from "../Api/stuApi";
+import { useSelector, useDispatch } from "react-redux";
+import { addStuListAsync, editStuListAsync } from "../redux/stuSlice";
 /**
  * 该组件有两个功能，一个是添加学生，另一个是修改学生
  * @param {*} props
@@ -8,6 +10,7 @@ import { addStu, getStuByid, editStuByIdApi } from "../Api/stuApi";
  */
 
 function Add(props) {
+  let dispath = useDispatch();
   const { id } = useParams();
   useEffect(() => {
     if (id) {
@@ -35,22 +38,24 @@ function Add(props) {
   function submitList(e) {
     e.preventDefault();
     if (id) {
-      editStuByIdApi(id, stu).then(() => {
-        navigate("/home", {
-          state: {
-            alert: "修改成功",
-            type: "success",
-          },
-        });
+      let data = {
+        id,
+        stu,
+      };
+      dispath(editStuListAsync(data));
+      navigate("/home", {
+        state: {
+          alert: "修改成功",
+          type: "success",
+        },
       });
     } else {
-      addStu(stu).then(() => {
-        navigate("/home", {
-          state: {
-            alert: "添加成功",
-            type: "success",
-          },
-        });
+      dispath(addStuListAsync(stu));
+      navigate("/home", {
+        state: {
+          alert: "添加成功",
+          type: "success",
+        },
       });
     }
   }

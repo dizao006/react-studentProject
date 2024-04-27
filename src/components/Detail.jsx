@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getStuByid, deleteStuByIdApi } from "../Api/stuApi";
+import { useSelector, useDispatch } from "react-redux";
+import { removeStuListAsync } from "../redux/stuSlice";
 function Detail(props) {
   // 获取路由参数
+  const { stuList } = useSelector((state) => state.stu);
+  let dispath = useDispatch();
   let { id } = useParams();
   const navigate = useNavigate();
   const [stuId, setStuId] = useState({
@@ -16,24 +19,17 @@ function Detail(props) {
     profile: "",
   });
   useEffect(() => {
-    getStuByid(id).then((e) => {
-      try {
-        setStuId(e.data);
-      } catch (error) {
-        window.alert("获取失败");
-        navigate("/home");
-      }
-    });
-  }, [id]);
+    const curStu = stuList.filter((stu) => stu.id === id);
+    setStuId(curStu[0]);
+  }, [id, stuList]);
   function deletestuId(id) {
     if (window.confirm("你是否要删除此学生？")) {
-      deleteStuByIdApi(id).then(() => {
-        navigate("/home", {
-          state: {
-            alert: "学生删除成功",
-            type: "info",
-          },
-        });
+      dispath(removeStuListAsync(id));
+      navigate("/home", {
+        state: {
+          alert: "学生删除成功",
+          type: "info",
+        },
       });
     }
   }

@@ -1,10 +1,12 @@
-import { getStuListApi } from "../Api/stuApi";
+// import { getStuListApi } from "../Api/stuApi";
 import React, { useState, useEffect } from "react";
 import Alert from "./Alert";
 import { useLocation, NavLink } from "react-router-dom";
-
+import { useSelector, useDispatch } from "react-redux";
+import { getStuListAsync } from "../redux/stuSlice";
 function Home(props) {
-  const [stuList, setStuList] = useState([]);
+  const { stuList } = useSelector((state) => state.stu);
+  const dispath = useDispatch();
   const [serchList, setSerchList] = useState([]);
   const [serach, setSerach] = useState("");
   const [state, setState] = useState({});
@@ -15,10 +17,10 @@ function Home(props) {
   }, [location]);
 
   useEffect(() => {
-    getStuListApi().then((e) => {
-      setStuList(e.data);
-    });
-  }, []);
+    if (!stuList.length) {
+      dispath(getStuListAsync());
+    }
+  }, [stuList]);
   function changeHeld(e) {
     setSerach(e.target.value);
     let serchList = stuList.filter((s) => {
@@ -28,6 +30,9 @@ function Home(props) {
   }
   let list = serach ? serchList : stuList;
   let trs = list.map((e) => {
+    console.log("====================================");
+    console.log(e.id);
+    console.log("====================================");
     return (
       <tr key={e.id}>
         <td>{e.name}</td>
